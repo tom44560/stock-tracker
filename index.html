@@ -146,73 +146,102 @@ function detectSignal(stock, pnlPct) {
   const hasProfit = pnlPct > 0;
   const checkExit = isBoss || !isHighProfit;
   const checkProfit = isBoss || isHighProfit;
-  let eT=false, pT=false, eR="", pR="";
+
+  // Collect ALL triggered reasons
+  const exitReasons = [];
+  const profitReasons = [];
 
   if (checkExit) {
-    const es = stock.exitStrategy;
-    if (es==="any_profit"&&hasProfit){eT=true;eR="現在有獲利，可考慮出場";}
-    if (es==="weekly_close"&&ref.lastWeekClose&&price<+ref.lastWeekClose){eT=true;eR=`收盤(${price})低於上週五(${ref.lastWeekClose})`;}
-    if (es==="ma10"&&ref.ma10&&price<+ref.ma10){eT=true;eR=`收盤(${price})跌破10日線(${ref.ma10})`;}
-    if (es==="custom_ma"&&ref.customMAVal&&price<+ref.customMAVal){eT=true;eR=`收盤(${price})跌破${stock.customMA}(${ref.customMAVal})`;}
-    if (es==="ma5_close"&&ref.ma5&&price<+ref.ma5){eT=true;eR=`收盤(${price})跌破5日線(${ref.ma5})`;}
-    if (es==="4day_stuck"&&ref.fourDayPnlPct!==undefined){const p=+ref.fourDayPnlPct;if(!isNaN(p)&&Math.abs(p)<=3){eT=true;eR=`買進後4日損益仍在${p}%，建議出場`;}}
-    if (es==="long_ma"&&ref.longMAVal&&price<+ref.longMAVal){eT=true;eR=`收盤(${price})跌破長周期均線(${ref.longMAVal})`;}
-    if (es==="monthly_macd"&&ref.macdShrink){eT=true;eR="月MACD紅柱比上月短，金流可能走了";}
-    if (es==="revenue_yoy"&&ref.revenueNeg){eT=true;eR="營收年增率(YoY)已轉負";}
+    const stype = getStype(stock.strategyGroup, stock.strategyType);
+    const exitOpts = stype?.exit || [];
+    // Check every exit condition available for this strategy
+    exitOpts.forEach(opt => {
+      const v = opt.v;
+      if (v==="any_profit"&&hasProfit) exitReasons.push("現在有獲利，可考慮出場");
+      if (v==="weekly_close"&&ref.lastWeekClose&&price<+ref.lastWeekClose) exitReasons.push(`收盤(${price})低於上週五(${ref.lastWeekClose})`);
+      if (v==="ma10"&&ref.ma10&&price<+ref.ma10) exitReasons.push(`收盤(${price})跌破10日線(${ref.ma10})`);
+      if (v==="custom_ma"&&ref.customMAVal&&price<+ref.customMAVal) exitReasons.push(`收盤(${price})跌破${stock.customMA||'自訂均線'}(${ref.customMAVal})`);
+      if (v==="ma5_close"&&ref.ma5&&price<+ref.ma5) exitReasons.push(`收盤(${price})跌破5日線(${ref.ma5})`);
+      if (v==="4day_stuck"&&ref.fourDayPnlPct!==undefined){const p=+ref.fourDayPnlPct;if(!isNaN(p)&&Math.abs(p)<=3)exitReasons.push(`買進後4日損益仍在${p}%，建議出場`);}
+      if (v==="long_ma"&&ref.longMAVal&&price<+ref.longMAVal) exitReasons.push(`收盤(${price})跌破長周期均線(${ref.longMAVal})`);
+      if (v==="monthly_macd"&&ref.macdShrink) exitReasons.push("月MACD紅柱比上月短，金流可能走了");
+      if (v==="revenue_yoy"&&ref.revenueNeg) exitReasons.push("營收年增率(YoY)已轉負");
+    });
   }
   if (checkProfit) {
-    const ps = stock.profitStrategy;
-    if (ps==="any_profit"&&hasProfit){pT=true;pR="現在有獲利，可考慮停利";}
-    if (ps==="ma20"&&ref.ma20&&price<+ref.ma20){pT=true;pR=`收盤(${price})跌破月線20MA(${ref.ma20})`;}
-    if (ps==="ma5_or_ma10"){const m5=ref.ma5?+ref.ma5:null;const m10=ref.ma10?+ref.ma10:null;if((m5&&price<m5)||(m10&&price<m10)){pT=true;pR=`收盤(${price})跌破${m5&&price<m5?`5日線(${ref.ma5})`:`10日線(${ref.ma10})`}`;}}
-    if (ps==="ma_daily"&&ref.maDailyVal&&price<+ref.maDailyVal){pT=true;pR=`收盤(${price})跌破均線(${ref.maDailyVal})`;}
-    if (ps==="weekly_close_compare"&&ref.thisWeekClose&&price<+ref.thisWeekClose){pT=true;pR=`本週五收盤(${price})低於上週五(${ref.thisWeekClose})`;}
-    if (ps==="weekly_macd"&&ref.weeklyMacdDown){pT=true;pR="週MACD柱狀體開始往下";}
+    const stype = getStype(stock.strategyGroup, stock.strategyType);
+    const profitOpts = stype?.profit || [];
+    profitOpts.forEach(opt => {
+      const v = opt.v;
+      if (v==="any_profit"&&hasProfit) profitReasons.push("現在有獲利，可考慮停利");
+      if (v==="ma20"&&ref.ma20&&price<+ref.ma20) profitReasons.push(`收盤(${price})跌破月線20MA(${ref.ma20})`);
+      if (v==="ma5_or_ma10"){const m5=ref.ma5?+ref.ma5:null;const m10=ref.ma10?+ref.ma10:null;if(m5&&price<m5)profitReasons.push(`收盤(${price})跌破5日線(${ref.ma5})`);if(m10&&price<m10)profitReasons.push(`收盤(${price})跌破10日線(${ref.ma10})`);}
+      if (v==="ma_daily"&&ref.maDailyVal&&price<+ref.maDailyVal) profitReasons.push(`收盤(${price})跌破均線(${ref.maDailyVal})`);
+      if (v==="weekly_close_compare"&&ref.thisWeekClose&&price<+ref.thisWeekClose) profitReasons.push(`下週五收盤(${price})低於本週五(${ref.thisWeekClose})`);
+      if (v==="weekly_macd"&&ref.weeklyMacdDown) profitReasons.push("週MACD柱狀體開始往下");
+    });
   }
-  return {eT,pT,eR,pR};
+
+  return {
+    eT: exitReasons.length > 0,
+    pT: profitReasons.length > 0,
+    eR: exitReasons.join(" / "),
+    pR: profitReasons.join(" / "),
+    exitReasons,
+    profitReasons,
+  };
 }
 
 function getRefFields(stock) {
-  const fields=[];const es=stock.exitStrategy;const ps=stock.profitStrategy;
-  if(es==="weekly_close")fields.push({k:"lastWeekClose",l:"上週五收盤價"});
-  if(es==="ma10")fields.push({k:"ma10",l:"10日線(MA10)"});
-  if(es==="custom_ma")fields.push({k:"customMAVal",l:(stock.customMA||"自訂均線")+"數值"});
-  if(es==="ma5_close")fields.push({k:"ma5",l:"5日線(MA5)"});
-  if(es==="4day_stuck")fields.push({k:"fourDayPnlPct",l:"買進後第4日損益%"});
-  if(es==="long_ma")fields.push({k:"longMAVal",l:"長周期均線數值"});
-  if(es==="monthly_macd")fields.push({k:"macdShrink",l:"月MACD紅柱縮短了？",toggle:true});
-  if(es==="revenue_yoy")fields.push({k:"revenueNeg",l:"營收YoY已轉負？",toggle:true});
-  if(ps==="ma20")fields.push({k:"ma20",l:"月線(MA20)"});
-  if(ps==="ma5_or_ma10"){if(!fields.find(f=>f.k==="ma5"))fields.push({k:"ma5",l:"5日線(MA5)"});if(!fields.find(f=>f.k==="ma10"))fields.push({k:"ma10",l:"10日線(MA10)"});}
-  if(ps==="ma_daily")fields.push({k:"maDailyVal",l:"守護均線數值"});
-  if(ps==="weekly_close_compare")fields.push({k:"thisWeekClose",l:"本週五收盤價"});
-  if(ps==="weekly_macd")fields.push({k:"weeklyMacdDown",l:"週MACD柱開始往下？",toggle:true});
-  const seen=new Set();return fields.filter(f=>{if(seen.has(f.k))return false;seen.add(f.k);return true;});
+  // Show ALL fields for ALL conditions in this strategy type (not just selected one)
+  const fields=[];
+  const stype = getStype(stock.strategyGroup, stock.strategyType);
+  const allOpts = [...(stype?.exit||[]), ...(stype?.profit||[])];
+  allOpts.forEach(opt=>{
+    const v=opt.v;
+    if(v==="weekly_close"&&!fields.find(f=>f.k==="lastWeekClose")) fields.push({k:"lastWeekClose",l:"上週五收盤價（週K出場用）"});
+    if(v==="ma10"&&!fields.find(f=>f.k==="ma10")) fields.push({k:"ma10",l:"10日線(MA10)"});
+    if(v==="custom_ma"&&!fields.find(f=>f.k==="customMAVal")) fields.push({k:"customMAVal",l:(stock.customMA||"自訂均線")+"數值"});
+    if(v==="ma5_close"&&!fields.find(f=>f.k==="ma5")) fields.push({k:"ma5",l:"5日線(MA5)"});
+    if(v==="4day_stuck"&&!fields.find(f=>f.k==="fourDayPnlPct")) fields.push({k:"fourDayPnlPct",l:"買進後第4日損益%"});
+    if(v==="long_ma"&&!fields.find(f=>f.k==="longMAVal")) fields.push({k:"longMAVal",l:"長周期均線數值"});
+    if(v==="monthly_macd"&&!fields.find(f=>f.k==="macdShrink")) fields.push({k:"macdShrink",l:"月MACD紅柱縮短了？",toggle:true});
+    if(v==="revenue_yoy"&&!fields.find(f=>f.k==="revenueNeg")) fields.push({k:"revenueNeg",l:"營收YoY已轉負？",toggle:true});
+    if(v==="ma20"&&!fields.find(f=>f.k==="ma20")) fields.push({k:"ma20",l:"月線(MA20)"});
+    if(v==="ma5_or_ma10"){if(!fields.find(f=>f.k==="ma5"))fields.push({k:"ma5",l:"5日線(MA5)"});if(!fields.find(f=>f.k==="ma10"))fields.push({k:"ma10",l:"10日線(MA10)"});}
+    if(v==="ma_daily"&&!fields.find(f=>f.k==="maDailyVal")) fields.push({k:"maDailyVal",l:"守護均線數值"});
+    if(v==="weekly_close_compare"&&!fields.find(f=>f.k==="thisWeekClose")) fields.push({k:"thisWeekClose",l:"本週五收盤價"});
+    if(v==="weekly_macd"&&!fields.find(f=>f.k==="weeklyMacdDown")) fields.push({k:"weeklyMacdDown",l:"週MACD柱開始往下？",toggle:true});
+  });
+  return fields;
 }
 
 async function fetchStock() {
   const symbol = form.symbol || document.querySelector('input[placeholder="e.g. 2330"]')?.value;
   if(!symbol||symbol.length<4){alert("請先輸入股票代碼");return;}
   form.symbol = symbol;
-  fetching=true;fetchMsg="查詢中...";render();
+  fetching=true;fetchMsg="查詢中（約5~10秒）...";render();
   try {
-    console.log("Fetching:", `${API}/stock?symbol=${symbol}`);
-    const res=await fetch(`${API}/stock?symbol=${symbol}`);
+    const res=await fetch(`${API}/quote?symbol=${symbol}`);
     const data=await res.json();
-    console.log("Got data:", data);
-    if(data.stat==="OK"&&data.data&&data.data.length>0){
-      const latest=data.data[data.data.length-1];
-      const closePrice=parseFloat(String(latest[6]).replace(/,/g,""));
-      const titleParts=data.title.split(" ").map(s=>s.trim()).filter(Boolean);
-      const nameIdx=titleParts.findIndex(p=>p===symbol);
-      const stockName=nameIdx>=0&&titleParts[nameIdx+1]?titleParts[nameIdx+1]:symbol;
-      form.name=stockName;
-      form.currentPrice=String(closePrice);
-      fetchMsg="✅ "+stockName+" 收盤價 $"+closePrice;
+    if(data.close){
+      form.name=data.name||symbol;
+      form.currentPrice=String(data.close);
+      // Auto-fill ref data
+      if(!form._refData) form._refData={};
+      if(data.ma5) form._refData.ma5=String(data.ma5);
+      if(data.ma10) form._refData.ma10=String(data.ma10);
+      if(data.ma20) form._refData.ma20=String(data.ma20);
+      if(data.lastWeekFriday) form._refData.lastWeekClose=String(data.lastWeekFriday.close);
+      if(data.thisWeekFriday) form._refData.thisWeekClose=String(data.thisWeekFriday.close);
+      let msg="✅ "+form.name+" 收盤$"+data.close;
+      if(data.ma5) msg+=" MA5:"+data.ma5;
+      if(data.ma10) msg+=" MA10:"+data.ma10;
+      if(data.ma20) msg+=" MA20:"+data.ma20;
+      fetchMsg=msg;
     } else { fetchMsg="⚠️ 查無資料，請手動輸入"; }
-  } catch(e) { 
-    console.error("Fetch error:", e);
-    fetchMsg="❌ 查詢失敗: "+e.message; 
+  } catch(e) {
+    fetchMsg="❌ 查詢失敗: "+e.message;
   }
   fetching=false;
   render();
@@ -241,11 +270,40 @@ function openEdit(stock) {
   editId=stock.id;strategyTab="exit";fetchMsg="";showForm=true;render();
 }
 function handleSave() {
-  if(!form.symbol||!form.shares||!form.buyPrice||!form.currentPrice){alert("請填寫所有欄位");return;}
-  const parsed={symbol:form.symbol.trim().toUpperCase(),name:form.name||form.symbol,shares:+form.shares,buyPrice:+form.buyPrice,currentPrice:+form.currentPrice,strategyGroup:form.strategyGroup,strategyType:form.strategyType,exitStrategy:form.exitStrategy,profitStrategy:form.profitStrategy,customMA:form.customMA,refData:{}};
+  // Read latest values from DOM inputs before saving
+  const inputs = document.querySelectorAll('.modal input.field-input, .modal input[class="field-input"]');
+  inputs.forEach(inp => {
+    if(inp.id==='input-name') form.name=inp.value;
+    else if(inp.id==='input-price') form.currentPrice=inp.value;
+    else if(inp.placeholder==='e.g. 2330') form.symbol=inp.value;
+    else if(inp.placeholder==='e.g. 台積電') form.name=inp.value;
+    else if(inp.placeholder==='e.g. 100') form.shares=inp.value;
+    else if(inp.placeholder==='e.g. 850') form.buyPrice=inp.value;
+    else if(inp.placeholder==='e.g. 920') form.currentPrice=inp.value;
+  });
+  if(!form.symbol||!form.shares||!form.buyPrice||!form.currentPrice){
+    alert("請填寫所有欄位（代碼、數量、買入價、現在價格）");return;
+  }
+  const parsed={
+    symbol:form.symbol.trim().toUpperCase(),
+    name:form.name||form.symbol,
+    shares:+form.shares,
+    buyPrice:+form.buyPrice,
+    currentPrice:+form.currentPrice,
+    strategyGroup:form.strategyGroup,
+    strategyType:form.strategyType,
+    exitStrategy:form.exitStrategy,
+    profitStrategy:form.profitStrategy,
+    customMA:form.customMA,
+    refData:{}
+  };
   if(isNaN(parsed.shares)||isNaN(parsed.buyPrice)||isNaN(parsed.currentPrice)){alert("數字格式不正確");return;}
   if(editId!==null){const i=stocks.findIndex(s=>s.id===editId);if(i>=0){parsed.refData=stocks[i].refData||{};stocks[i]={...stocks[i],...parsed};}}
-  else{stocks.push({id:Date.now(),...parsed});}
+  else{
+    if(form._refData) parsed.refData={...parsed.refData,...form._refData};
+    stocks.push({id:Date.now(),...parsed});
+    form._refData=null;
+  }
   save();showForm=false;render();
 }
 function deleteStock(id){stocks=stocks.filter(s=>s.id!==id);save();render();}
