@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="zh-TW">
 <head>
 <meta charset="UTF-8">
@@ -22,58 +21,58 @@ const STORAGE_KEY = "stock_portfolio_v3";
 const API_URL = "https://stock-api-1-bi2k.onrender.com/stock";
 
 const STRATEGY_GROUPS = {
-worker: {
-label: “上班族型”, icon: “💼”, color: “#6366f1”,
-types: {
-standard: {
-label: “週趨勢策略”, icon: “📅”,
-description: “以週K為主要判斷依據，節奏較慢，適合不常看盤”,
-exit: [
-{ value: “weekly_close”, label: “週K收盤價低於上週五” },
-{ value: “ma10”, label: “收盤價跌破10日線” },
-{ value: “custom_ma”, label: “自訂均線出場” },
-{ value: “any_profit”, label: “有賺錢就賣” },
-],
-profit: [
-{ value: “weekly_macd”, label: “週MACD柱狀體開始往下（週五收盤為準）” },
-{ value: “ma20”, label: “跌破月線(20MA)” },
-{ value: “any_profit”, label: “有賺錢就賣” },
-],
-},
-aggressive: {
-label: “強勢週策略”, icon: “⚡”,
-description: “以5日線為主，節奏快，適合看到強勢股短線操作”,
-exit: [
-{ value: “ma5_close”, label: “收盤跌破5日線” },
-{ value: “4day_stuck”, label: “買進後4個交易日損益仍在±1~3%就賣出” },
-{ value: “any_profit”, label: “有賺錢就賣” },
-],
-profit: [
-{ value: “ma5_or_ma10”, label: “收盤跌破5日線 / 10日線” },
-{ value: “any_profit”, label: “有賺錢就賣” },
-],
-},
-},
-},
-boss: {
-label: “老闆型”, icon: “👔”, color: “#f59e0b”,
-types: {
-longterm: {
-label: “長線控盤策略”, icon: “🏦”,
-description: “月線/月MACD/營收為依據，節奏最慢，適合長線持有”,
-exit: [
-{ value: “long_ma”, label: “守一條更長周期的均線（自行設定）” },
-{ value: “monthly_macd”, label: “當月月MACD紅柱比上月短（月底最後一天判斷）” },
-{ value: “revenue_yoy”, label: “營收年增率(YoY)轉負” },
-],
-profit: [
-{ value: “ma_daily”, label: “守一條均線（10日線 / 月線20MA）” },
-{ value: “weekly_close_compare”, label: “下週五收盤須高於本週五收盤價” },
-{ value: “any_profit”, label: “有賺錢就賣” },
-],
-},
-},
-},
+  worker: {
+    label: "上班族型", icon: "💼", color: "#6366f1",
+    types: {
+      standard: {
+        label: "週趨勢策略", icon: "📅",
+        description: "以週K為主要判斷依據，節奏較慢，適合不常看盤",
+        exit: [
+          { value: "weekly_close", label: "週K收盤價低於上週五" },
+          { value: "ma10", label: "收盤價跌破10日線" },
+          { value: "custom_ma", label: "自訂均線出場" },
+          { value: "any_profit", label: "有賺錢就賣" },
+        ],
+        profit: [
+          { value: "weekly_macd", label: "週MACD柱狀體開始往下（週五收盤為準）" },
+          { value: "ma20", label: "跌破月線(20MA)" },
+          { value: "any_profit", label: "有賺錢就賣" },
+        ],
+      },
+      aggressive: {
+        label: "強勢週策略", icon: "⚡",
+        description: "以5日線為主，節奏快，適合看到強勢股短線操作",
+        exit: [
+          { value: "ma5_close", label: "收盤跌破5日線" },
+          { value: "4day_stuck", label: "買進後4個交易日損益仍在±1~3%就賣出" },
+          { value: "any_profit", label: "有賺錢就賣" },
+        ],
+        profit: [
+          { value: "ma5_or_ma10", label: "收盤跌破5日線 / 10日線" },
+          { value: "any_profit", label: "有賺錢就賣" },
+        ],
+      },
+    },
+  },
+  boss: {
+    label: "老闆型", icon: "👔", color: "#f59e0b",
+    types: {
+      longterm: {
+        label: "長線控盤策略", icon: "🏦",
+        description: "月線/月MACD/營收為依據，節奏最慢，適合長線持有",
+        exit: [
+          { value: "long_ma", label: "守一條更長周期的均線（自行設定）" },
+          { value: "monthly_macd", label: "當月月MACD紅柱比上月短（月底最後一天判斷）" },
+          { value: "revenue_yoy", label: "營收年增率(YoY)轉負" },
+        ],
+        profit: [
+          { value: "ma_daily", label: "守一條均線（10日線 / 月線20MA）" },
+          { value: "weekly_close_compare", label: "下週五收盤須高於本週五收盤價" },
+          { value: "any_profit", label: "有賺錢就賣" },
+        ],
+      },
+    },
+  },
 };
 
 function getStrategyType(g, t) { return STRATEGY_GROUPS[g]?.types[t]; }
@@ -81,404 +80,397 @@ function getExitLabel(g, t, v) { return getStrategyType(g,t)?.exit.find(o=>o.val
 function getProfitLabel(g, t, v) { return getStrategyType(g,t)?.profit.find(o=>o.value===v)?.label||v; }
 
 const defaultStocks = [
-{ id:1, symbol:“2330”, name:“台積電”, shares:100, buyPrice:850, currentPrice:920, strategyGroup:“worker”, strategyType:“standard”, exitStrategy:“weekly_close”, profitStrategy:“weekly_macd”, customMA:””, refData:{} },
+  { id:1, symbol:"2330", name:"台積電", shares:100, buyPrice:850, currentPrice:920, strategyGroup:"worker", strategyType:"standard", exitStrategy:"weekly_close", profitStrategy:"weekly_macd", customMA:"", refData:{} },
 ];
 
-function fmt(n) { return Number(n).toLocaleString(“zh-TW”,{minimumFractionDigits:2,maximumFractionDigits:2}); }
+function fmt(n) { return Number(n).toLocaleString("zh-TW",{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
 function detectSignal(stock, pnlPct) {
-const price = parseFloat(stock.currentPrice);
-const ref = stock.refData || {};
-const isBoss = stock.strategyGroup === “boss”;
-const isHighProfit = pnlPct >= 10;
-const hasProfit = pnlPct > 0;
-const checkExit = isBoss || !isHighProfit;
-const checkProfit = isBoss || isHighProfit;
-let exitTriggered=false, profitTriggered=false, exitReason=””, profitReason=””;
+  const price = parseFloat(stock.currentPrice);
+  const ref = stock.refData || {};
+  const isBoss = stock.strategyGroup === "boss";
+  const isHighProfit = pnlPct ≥ 10;
+  const hasProfit = pnlPct > 0;
+  const checkExit = isBoss || !isHighProfit;
+  const checkProfit = isBoss || isHighProfit;
+  let exitTriggered=false, profitTriggered=false, exitReason="", profitReason="";
 
-if (checkExit) {
-const es = stock.exitStrategy;
-if (es===“any_profit”&&hasProfit){exitTriggered=true;exitReason=“現在有獲利，可考慮出場”;}
-if (es===“weekly_close”&&ref.lastWeekClose&&price<parseFloat(ref.lastWeekClose)){exitTriggered=true;exitReason=`收盤(${price})低於上週五(${ref.lastWeekClose})`;}
-if (es===“ma10”&&ref.ma10&&price<parseFloat(ref.ma10)){exitTriggered=true;exitReason=`收盤(${price})跌破10日線(${ref.ma10})`;}
-if (es===“custom_ma”&&ref.customMAVal&&price<parseFloat(ref.customMAVal)){exitTriggered=true;exitReason=`收盤(${price})跌破${stock.customMA}(${ref.customMAVal})`;}
-if (es===“ma5_close”&&ref.ma5&&price<parseFloat(ref.ma5)){exitTriggered=true;exitReason=`收盤(${price})跌破5日線(${ref.ma5})`;}
-if (es===“4day_stuck”&&ref.fourDayPnlPct!==undefined){const p=parseFloat(ref.fourDayPnlPct);if(!isNaN(p)&&Math.abs(p)<=3){exitTriggered=true;exitReason=`買進後4日損益仍在${p}%，建議出場`;}}
-if (es===“long_ma”&&ref.longMAVal&&price<parseFloat(ref.longMAVal)){exitTriggered=true;exitReason=`收盤(${price})跌破長周期均線(${ref.longMAVal})`;}
-if (es===“monthly_macd”&&ref.macdShrink){exitTriggered=true;exitReason=“月MACD紅柱比上月短，金流可能走了”;}
-if (es===“revenue_yoy”&&ref.revenueNeg){exitTriggered=true;exitReason=“營收年增率(YoY)已轉負”;}
-}
-if (checkProfit) {
-const ps = stock.profitStrategy;
-if (ps===“any_profit”&&hasProfit){profitTriggered=true;profitReason=“現在有獲利，可考慮停利”;}
-if (ps===“ma20”&&ref.ma20&&price<parseFloat(ref.ma20)){profitTriggered=true;profitReason=`收盤(${price})跌破月線20MA(${ref.ma20})`;}
-if (ps===“ma5_or_ma10”){const ma5v=ref.ma5?parseFloat(ref.ma5):null;const ma10v=ref.ma10?parseFloat(ref.ma10):null;if((ma5v&&price<ma5v)||(ma10v&&price<ma10v)){profitTriggered=true;profitReason=`收盤(${price})跌破${ma5v&&price<ma5v?`5日線(${ref.ma5})`:`10日線(${ref.ma10})`}`;}}
-if (ps===“ma_daily”&&ref.maDailyVal&&price<parseFloat(ref.maDailyVal)){profitTriggered=true;profitReason=`收盤(${price})跌破均線(${ref.maDailyVal})`;}
-if (ps===“weekly_close_compare”&&ref.thisWeekClose&&price<parseFloat(ref.thisWeekClose)){profitTriggered=true;profitReason=`本週五收盤(${price})低於上週五(${ref.thisWeekClose})`;}
-if (ps===“weekly_macd”&&ref.weeklyMacdDown){profitTriggered=true;profitReason=“週MACD柱狀體開始往下”;}
-}
-return {exitTriggered,profitTriggered,exitReason,profitReason};
+  if (checkExit) {
+    const es = stock.exitStrategy;
+    if (es==="any_profit"&&hasProfit){exitTriggered=true;exitReason="現在有獲利，可考慮出場";}
+    if (es==="weekly_close"&&ref.lastWeekClose&&price<parseFloat(ref.lastWeekClose)){exitTriggered=true;exitReason=`收盤(${price})低於上週五(${ref.lastWeekClose})`;}
+    if (es==="ma10"&&ref.ma10&&price<parseFloat(ref.ma10)){exitTriggered=true;exitReason=`收盤(${price})跌破10日線(${ref.ma10})`;}
+    if (es==="custom_ma"&&ref.customMA✓al&&price<parseFloat(ref.customMA✓al)){exitTriggered=true;exitReason=`收盤(${price})跌破${stock.customMA}(${ref.customMA✓al})`;}
+    if (es==="ma5_close"&&ref.ma5&&price<parseFloat(ref.ma5)){exitTriggered=true;exitReason=`收盤(${price})跌破5日線(${ref.ma5})`;}
+    if (es==="4day_stuck"&&ref.fourDayPnlPct!==undefined){const p=parseFloat(ref.fourDayPnlPct);if(!isNaN(p)&&Math.abs(p)<=3){exitTriggered=true;exitReason=`買進後4日損益仍在${p}%，建議出場`;}}
+    if (es==="long_ma"&&ref.longMA✓al&&price<parseFloat(ref.longMA✓al)){exitTriggered=true;exitReason=`收盤(${price})跌破長周期均線(${ref.longMA✓al})`;}
+    if (es==="monthly_macd"&&ref.macdShrink){exitTriggered=true;exitReason="月MACD紅柱比上月短";}
+    if (es==="revenue_yoy"&&ref.revenueNeg){exitTriggered=true;exitReason="營收年增率(YoY)已轉負";}
+  }
+  if (checkProfit) {
+    const ps = stock.profitStrategy;
+    if (ps==="any_profit"&&hasProfit){profitTriggered=true;profitReason="現在有獲利，可考慮停利";}
+    if (ps==="ma20"&&ref.ma20&&price<parseFloat(ref.ma20)){profitTriggered=true;profitReason=`收盤(${price})跌破月線20MA(${ref.ma20})`;}
+    if (ps==="ma5_or_ma10"){const ma5v=ref.ma5?parseFloat(ref.ma5):null;const ma10v=ref.ma10?parseFloat(ref.ma10):null;if((ma5v&&price<ma5v)||(ma10v&&price<ma10v)){profitTriggered=true;profitReason=`收盤(${price})跌破${ma5v&&price<ma5v?`5日線(${ref.ma5})`:`10日線(${ref.ma10})`}`;}}
+    if (ps==="ma_daily"&&ref.maDaily✓al&&price<parseFloat(ref.maDaily✓al)){profitTriggered=true;profitReason=`收盤(${price})跌破均線(${ref.maDaily✓al})`;}
+    if (ps==="weekly_close_compare"&&ref.thisWeekClose&&price<parseFloat(ref.thisWeekClose)){profitTriggered=true;profitReason=`本週五收盤(${price})低於上週五(${ref.thisWeekClose})`;}
+    if (ps==="weekly_macd"&&ref.weeklyMacdDown){profitTriggered=true;profitReason="週MACD柱狀體開始往下";}
+  }
+  return {exitTriggered,profitTriggered,exitReason,profitReason};
 }
 
 function getRefFields(stock) {
-const fields=[];const es=stock.exitStrategy;const ps=stock.profitStrategy;
-if(es===“weekly_close”)fields.push({key:“lastWeekClose”,label:“上週五收盤價”});
-if(es===“ma10”)fields.push({key:“ma10”,label:“10日線(MA10)”});
-if(es===“custom_ma”)fields.push({key:“customMAVal”,label:`${stock.customMA||"自訂均線"}數值`});
-if(es===“ma5_close”)fields.push({key:“ma5”,label:“5日線(MA5)”});
-if(es===“4day_stuck”)fields.push({key:“fourDayPnlPct”,label:“買進後第4日損益%”});
-if(es===“long_ma”)fields.push({key:“longMAVal”,label:“長周期均線數值”});
-if(es===“monthly_macd”)fields.push({key:“macdShrink”,label:“月MACD紅柱縮短了？”,type:“toggle”});
-if(es===“revenue_yoy”)fields.push({key:“revenueNeg”,label:“營收YoY已轉負？”,type:“toggle”});
-if(ps===“ma20”)fields.push({key:“ma20”,label:“月線(MA20)”});
-if(ps===“ma5_or_ma10”){if(!fields.find(f=>f.key===“ma5”))fields.push({key:“ma5”,label:“5日線(MA5)”});if(!fields.find(f=>f.key===“ma10”))fields.push({key:“ma10”,label:“10日線(MA10)”});}
-if(ps===“ma_daily”)fields.push({key:“maDailyVal”,label:“守護均線數值”});
-if(ps===“weekly_close_compare”)fields.push({key:“thisWeekClose”,label:“本週五收盤價”});
-if(ps===“weekly_macd”)fields.push({key:“weeklyMacdDown”,label:“週MACD柱開始往下？”,type:“toggle”});
-const seen=new Set();return fields.filter(f=>{if(seen.has(f.key))return false;seen.add(f.key);return true;});
+  const fields=[];const es=stock.exitStrategy;const ps=stock.profitStrategy;
+  if(es==="weekly_close")fields.push({key:"lastWeekClose",label:"上週五收盤價"});
+  if(es==="ma10")fields.push({key:"ma10",label:"10日線(MA10)"});
+  if(es==="custom_ma")fields.push({key:"customMA✓al",label:`${stock.customMA||"自訂均線"}數值`});
+  if(es==="ma5_close")fields.push({key:"ma5",label:"5日線(MA5)"});
+  if(es==="4day_stuck")fields.push({key:"fourDayPnlPct",label:"買進後第4日損益%"});
+  if(es==="long_ma")fields.push({key:"longMA✓al",label:"長周期均線數值"});
+  if(es==="monthly_macd")fields.push({key:"macdShrink",label:"月MACD紅柱縮短了？",type:"toggle"});
+  if(es==="revenue_yoy")fields.push({key:"revenueNeg",label:"營收YoY已轉負？",type:"toggle"});
+  if(ps==="ma20")fields.push({key:"ma20",label:"月線(MA20)"});
+  if(ps==="ma5_or_ma10"){if(!fields.find(f=>f.key==="ma5"))fields.push({key:"ma5",label:"5日線(MA5)"});if(!fields.find(f=>f.key==="ma10"))fields.push({key:"ma10",label:"10日線(MA10)"});}
+  if(ps==="ma_daily")fields.push({key:"maDaily✓al",label:"守護均線數值"});
+  if(ps==="weekly_close_compare")fields.push({key:"thisWeekClose",label:"本週五收盤價"});
+  if(ps==="weekly_macd")fields.push({key:"weeklyMacdDown",label:"週MACD柱開始往下？",type:"toggle"});
+  const seen=new Set();return fields.filter(f=>{if(seen.has(f.key))return false;seen.add(f.key);return true;});
 }
 
 function StrategyPanel({stock, pnlPct, onUpdateRef}) {
-const isBoss = stock.strategyGroup===“boss”;
-const isHighProfit = pnlPct>=10;
-const group = STRATEGY_GROUPS[stock.strategyGroup];
-const stype = group?.types[stock.strategyType];
-const groupColor = group?.color||”#6366f1”;
-const [showRef, setShowRef] = useState(false);
-const exitLabel = getExitLabel(stock.strategyGroup, stock.strategyType, stock.exitStrategy);
-const profitLabel = getProfitLabel(stock.strategyGroup, stock.strategyType, stock.profitStrategy);
-const refFields = getRefFields(stock);
-const {exitTriggered,profitTriggered,exitReason,profitReason} = detectSignal(stock, pnlPct);
-const anySignal = exitTriggered||profitTriggered;
+  const isBoss = stock.strategyGroup==="boss";
+  const isHighProfit = pnlPct≥10;
+  const group = STRATEGY_GROUPS[stock.strategyGroup];
+  const stype = group?.types[stock.strategyType];
+  const groupColor = group?.color||"#6366f1";
+  const [showRef, setShowRef] = useState(false);
+  const exitLabel = getExitLabel(stock.strategyGroup, stock.strategyType, stock.exitStrategy);
+  const profitLabel = getProfitLabel(stock.strategyGroup, stock.strategyType, stock.profitStrategy);
+  const refFields = getRefFields(stock);
+  const {exitTriggered,profitTriggered,exitReason,profitReason} = detectSignal(stock, pnlPct);
+  const anySignal = exitTriggered||profitTriggered;
 
-return (
-<div style={{marginTop:14,borderTop:“1px solid #f1f5f9”,paddingTop:12}}>
-{stype&&(
-<div style={{display:“flex”,alignItems:“center”,gap:6,marginBottom:10}}>
-<span style={{background:groupColor+“18”,color:groupColor,border:`1px solid ${groupColor}40`,borderRadius:20,padding:“2px 10px”,fontSize:11,fontWeight:800}}>{group.icon} {group.label}</span>
-<span style={{background:”#f1f5f9”,color:”#64748b”,borderRadius:20,padding:“2px 10px”,fontSize:11,fontWeight:700}}>{stype.icon} {stype.label}</span>
-</div>
-)}
+  return (
+    <div style={{marginTop:14,borderTop:"1px solid #f1f5f9",paddingTop:12}}>
+      {stype&&(
+        <div style={{display:"flex",alignItems:"center",gap:6,marginBottom:10}}>
+          <span style={{background:groupColor+"18",color:groupColor,border:`1px solid ${groupColor}40`,borderRadius:20,padding:"2px 10px",fontSize:11,fontWeight:800}}>{group.label}</span>
+          <span style={{background:"#f1f5f9",color:"#64748b",borderRadius:20,padding:"2px 10px",fontSize:11,fontWeight:700}}>{stype.label}</span>
+        </div>
+      )}
 
-```
-  {exitTriggered&&(
-    <div style={{background:isBoss?"linear-gradient(90deg,#7f1d1d,#991b1b)":"linear-gradient(90deg,#1e3a8a,#1d4ed8)",borderRadius:12,padding:"12px 16px",display:"flex",alignItems:"center",gap:10,marginBottom:8,boxShadow:"0 4px 16px rgba(0,0,0,0.2)",animation:"pulse 1.5s infinite"}}>
-      <span style={{fontSize:22}}>🚨</span>
-      <div>
-        <div style={{fontSize:13,fontWeight:900,color:"#fff"}}>{isBoss?"停損訊號觸發！":"出場訊號觸發！"}</div>
-        <div style={{fontSize:11,color:"rgba(255,255,255,0.8)",marginTop:2}}>{exitReason}</div>
-      </div>
-    </div>
-  )}
-  {profitTriggered&&(
-    <div style={{background:"linear-gradient(90deg,#78350f,#92400e)",borderRadius:12,padding:"12px 16px",display:"flex",alignItems:"center",gap:10,marginBottom:8,boxShadow:"0 4px 16px rgba(0,0,0,0.2)",animation:"pulse 1.5s infinite"}}>
-      <span style={{fontSize:22}}>🎯</span>
-      <div>
-        <div style={{fontSize:13,fontWeight:900,color:"#fff"}}>停利訊號觸發！</div>
-        <div style={{fontSize:11,color:"rgba(255,255,255,0.8)",marginTop:2}}>{profitReason}</div>
-      </div>
-    </div>
-  )}
+      {exitTriggered&&(
+        <div style={{background:isBoss?"linear-gradient(90deg,#7f1d1d,#991b1b)":"linear-gradient(90deg,#1e3a8a,#1d4ed8)",borderRadius:12,padding:"12px 16px",display:"flex",alignItems:"center",gap:10,marginBottom:8,boxShadow:"0 4px 16px rgba(0,0,0,0.2)",animation:"pulse 1.5s infinite"}}>
+          <span style={{fontSize:22}}>!</span>
+          <div>
+            <div style={{fontSize:13,fontWeight:900,color:"#fff"}}>{isBoss?"停損訊號觸發！":"出場訊號觸發！"}</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,0.8)",marginTop:2}}>{exitReason}</div>
+          </div>
+        </div>
+      )}
+      {profitTriggered&&(
+        <div style={{background:"linear-gradient(90deg,#78350f,#92400e)",borderRadius:12,padding:"12px 16px",display:"flex",alignItems:"center",gap:10,marginBottom:8,boxShadow:"0 4px 16px rgba(0,0,0,0.2)",animation:"pulse 1.5s infinite"}}>
+          <span style={{fontSize:22}}>🎯</span>
+          <div>
+            <div style={{fontSize:13,fontWeight:900,color:"#fff"}}>停利訊號觸發！</div>
+            <div style={{fontSize:11,color:"rgba(255,255,255,0.8)",marginTop:2}}>{profitReason}</div>
+          </div>
+        </div>
+      )}
 
-  {isBoss?(
-    <div style={{display:"flex",flexDirection:"column",gap:8}}>
-      <div style={{background:exitTriggered?"linear-gradient(90deg,#fff0f0,#fee2e2)":"#f8fafc",border:`1px solid ${exitTriggered?"#fca5a5":"#e2e8f0"}`,borderRadius:10,padding:"8px 12px",display:"flex",alignItems:"center",gap:8}}>
-        <span style={{fontSize:16}}>🔴</span>
-        <div><div style={{fontSize:12,fontWeight:800,color:exitTriggered?"#7f1d1d":"#374151"}}>停損點 SOP</div><div style={{fontSize:11,color:exitTriggered?"#991b1b":"#94a3b8",marginTop:2}}>觀察：{exitLabel}</div></div>
-      </div>
-      <div style={{background:profitTriggered?"linear-gradient(90deg,#fef9c3,#fef3c7)":"#f8fafc",border:`1px solid ${profitTriggered?"#fbbf24":"#e2e8f0"}`,borderRadius:10,padding:"8px 12px",display:"flex",alignItems:"center",gap:8}}>
-        <span style={{fontSize:16}}>🎯</span>
-        <div><div style={{fontSize:12,fontWeight:800,color:profitTriggered?"#92400e":"#374151"}}>停利點</div><div style={{fontSize:11,color:profitTriggered?"#a16207":"#94a3b8",marginTop:2}}>觀察：{profitLabel}</div></div>
-      </div>
-    </div>
-  ):(
-    <>
-      {isHighProfit?(
-        <div style={{background:profitTriggered?"linear-gradient(90deg,#fef9c3,#fef3c7)":"#f8fafc",border:`1px solid ${profitTriggered?"#fbbf24":"#e2e8f0"}`,borderRadius:10,padding:"8px 12px",display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-          <span style={{fontSize:16}}>🎯</span>
-          <div><div style={{fontSize:12,fontWeight:800,color:profitTriggered?"#92400e":"#374151"}}>獲利已達 10%↑ — 停利模式</div><div style={{fontSize:11,color:profitTriggered?"#a16207":"#94a3b8",marginTop:2}}>觀察：{profitLabel}</div></div>
+      {isBoss?(
+        <div style={{display:"flex",flexDirection:"column",gap:8}}>
+          <div style={{background:exitTriggered?"linear-gradient(90deg,#fff0f0,#fee2e2)":"#f8fafc",border:`1px solid ${exitTriggered?"#fca5a5":"#e2e8f0"}`,borderRadius:10,padding:"8px 12px",display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:16}}>🔴</span>
+            <div><div style={{fontSize:12,fontWeight:800,color:exitTriggered?"#7f1d1d":"#374151"}}>停損點 SOP</div><div style={{fontSize:11,color:exitTriggered?"#991b1b":"#94a3b8",marginTop:2}}>觀察：{exitLabel}</div></div>
+          </div>
+          <div style={{background:profitTriggered?"linear-gradient(90deg,#fef9c3,#fef3c7)":"#f8fafc",border:`1px solid ${profitTriggered?"#fbbf24":"#e2e8f0"}`,borderRadius:10,padding:"8px 12px",display:"flex",alignItems:"center",gap:8}}>
+            <span style={{fontSize:16}}>🎯</span>
+            <div><div style={{fontSize:12,fontWeight:800,color:profitTriggered?"#92400e":"#374151"}}>停利點</div><div style={{fontSize:11,color:profitTriggered?"#a16207":"#94a3b8",marginTop:2}}>觀察：{profitLabel}</div></div>
+          </div>
         </div>
       ):(
-        <div style={{background:exitTriggered?"linear-gradient(90deg,#eff6ff,#dbeafe)":"#f8fafc",border:`1px solid ${exitTriggered?"#93c5fd":"#e2e8f0"}`,borderRadius:10,padding:"8px 12px",display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
-          <span style={{fontSize:16}}>🛡️</span>
-          <div><div style={{fontSize:12,fontWeight:800,color:exitTriggered?"#1e40af":"#374151"}}>獲利未達 10% — 出場點監控中</div><div style={{fontSize:11,color:exitTriggered?"#1d4ed8":"#94a3b8",marginTop:2}}>觀察：{exitLabel}</div></div>
-        </div>
-      )}
-      <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}}>
-        <span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,background:!isHighProfit?"#dbeafe":"#f1f5f9",color:!isHighProfit?"#1d4ed8":"#94a3b8",border:`1px solid ${!isHighProfit?"#93c5fd":"#e2e8f0"}`}}>🛡️ 出場：{exitLabel}</span>
-        <span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,background:isHighProfit?"#fef3c7":"#f1f5f9",color:isHighProfit?"#92400e":"#94a3b8",border:`1px solid ${isHighProfit?"#fbbf24":"#e2e8f0"}`}}>🎯 停利：{profitLabel}</span>
-      </div>
-    </>
-  )}
-
-  {refFields.length>0&&(
-    <div style={{marginTop:8}}>
-      <button onClick={()=>setShowRef(v=>!v)} style={{background:anySignal?"#fef3c7":"#f1f5f9",border:`1px solid ${anySignal?"#fbbf24":"#e2e8f0"}`,borderRadius:8,padding:"5px 12px",fontSize:12,fontWeight:700,color:anySignal?"#92400e":"#64748b",cursor:"pointer"}}>
-        {showRef?"▲ 收起":"▼ 輸入參考數值"}{anySignal?" ⚡":""}
-      </button>
-      {showRef&&(
-        <div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>
-          {refFields.map(field=>(
-            <div key={field.key} style={{display:"flex",alignItems:"center",gap:8}}>
-              <label style={{fontSize:12,color:"#64748b",fontWeight:600,minWidth:140}}>{field.label}</label>
-              {field.type==="toggle"?(
-                <button onClick={()=>onUpdateRef(stock.id,field.key,!(stock.refData?.[field.key]))} style={{padding:"4px 14px",borderRadius:20,border:"none",cursor:"pointer",fontSize:12,fontWeight:700,background:stock.refData?.[field.key]?"#fee2e2":"#f1f5f9",color:stock.refData?.[field.key]?"#dc2626":"#64748b"}}>
-                  {stock.refData?.[field.key]?"是 ✓":"否"}
-                </button>
-              ):(
-                <input type="number" value={stock.refData?.[field.key]||""} onChange={e=>onUpdateRef(stock.id,field.key,e.target.value)} placeholder="輸入數值" style={{padding:"5px 10px",borderRadius:8,border:"1.5px solid #e2e8f0",fontSize:13,width:100,outline:"none"}}/>
-              )}
+        <>
+          {isHighProfit?(
+            <div style={{background:profitTriggered?"linear-gradient(90deg,#fef9c3,#fef3c7)":"#f8fafc",border:`1px solid ${profitTriggered?"#fbbf24":"#e2e8f0"}`,borderRadius:10,padding:"8px 12px",display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+              <span style={{fontSize:16}}>🎯</span>
+              <div><div style={{fontSize:12,fontWeight:800,color:profitTriggered?"#92400e":"#374151"}}>獲利已達 10%↑ - 停利模式</div><div style={{fontSize:11,color:profitTriggered?"#a16207":"#94a3b8",marginTop:2}}>觀察：{profitLabel}</div></div>
             </div>
-          ))}
+          ):(
+            <div style={{background:exitTriggered?"linear-gradient(90deg,#eff6ff,#dbeafe)":"#f8fafc",border:`1px solid ${exitTriggered?"#93c5fd":"#e2e8f0"}`,borderRadius:10,padding:"8px 12px",display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+              <span style={{fontSize:16}}>🛡️</span>
+              <div><div style={{fontSize:12,fontWeight:800,color:exitTriggered?"#1e40af":"#374151"}}>獲利未達 10% - 出場點監控中</div><div style={{fontSize:11,color:exitTriggered?"#1d4ed8":"#94a3b8",marginTop:2}}>觀察：{exitLabel}</div></div>
+            </div>
+          )}
+          <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:8}}>
+            <span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,background:!isHighProfit?"#dbeafe":"#f1f5f9",color:!isHighProfit?"#1d4ed8":"#94a3b8",border:`1px solid ${!isHighProfit?"#93c5fd":"#e2e8f0"}`}}>🛡️ 出場：{exitLabel}</span>
+            <span style={{display:"inline-flex",alignItems:"center",gap:4,padding:"3px 10px",borderRadius:20,fontSize:11,fontWeight:700,background:isHighProfit?"#fef3c7":"#f1f5f9",color:isHighProfit?"#92400e":"#94a3b8",border:`1px solid ${isHighProfit?"#fbbf24":"#e2e8f0"}`}}>🎯 停利：{profitLabel}</span>
+          </div>
+        </>
+      )}
+
+      {refFields.length>0&&(
+        <div style={{marginTop:8}}>
+          <button onClick={()=>setShowRef(v=>!v)} style={{background:anySignal?"#fef3c7":"#f1f5f9",border:`1px solid ${anySignal?"#fbbf24":"#e2e8f0"}`,borderRadius:8,padding:"5px 12px",fontSize:12,fontWeight:700,color:anySignal?"#92400e":"#64748b",cursor:"pointer"}}>
+            {showRef?"▲ 收起":"▼ 輸入參考數值"}{anySignal?" ⚡":""}
+          </button>
+          {showRef&&(
+            <div style={{marginTop:10,display:"flex",flexDirection:"column",gap:8}}>
+              {refFields.map(field=>(
+                <div key={field.key} style={{display:"flex",alignItems:"center",gap:8}}>
+                  <label style={{fontSize:12,color:"#64748b",fontWeight:600,minWidth:140}}>{field.label}</label>
+                  {field.type==="toggle"?(
+                    <button onClick={()=>onUpdateRef(stock.id,field.key,!(stock.refData?.[field.key]))} style={{padding:"4px 14px",borderRadius:20,border:"none",cursor:"pointer",fontSize:12,fontWeight:700,background:stock.refData?.[field.key]?"#fee2e2":"#f1f5f9",color:stock.refData?.[field.key]?"#dc2626":"#64748b"}}>
+                      {stock.refData?.[field.key]?"是 ✓":"否"}
+                    </button>
+                  ):(
+                    <input type="number" value={stock.refData?.[field.key]||""} onChange={e=>onUpdateRef(stock.id,field.key,e.target.value)} placeholder="輸入數值" style={{padding:"5px 10px",borderRadius:8,border:"1.5px solid #e2e8f0",fontSize:13,width:100,outline:"none"}}/>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
     </div>
-  )}
-</div>
-```
-
-);
+  );
 }
 
 function App() {
-const [stocks, setStocks] = useState(()=>{try{const s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):defaultStocks;}catch{return defaultStocks;}});
-const emptyForm = {symbol:””,name:””,shares:””,buyPrice:””,currentPrice:””,strategyGroup:“worker”,strategyType:“standard”,exitStrategy:“weekly_close”,profitStrategy:“weekly_macd”,customMA:””};
-const [form, setForm] = useState(emptyForm);
-const [editId, setEditId] = useState(null);
-const [showForm, setShowForm] = useState(false);
-const [error, setError] = useState(””);
-const [strategyTab, setStrategyTab] = useState(“exit”);
-const [fetching, setFetching] = useState(false);
-const [fetchMsg, setFetchMsg] = useState(””);
+  const [stocks, setStocks] = useState(()=>{try{const s=localStorage.getItem(STORAGE_KEY);return s?JSON.parse(s):defaultStocks;}catch{return defaultStocks;}});
+  const emptyForm = {symbol:"",name:"",shares:"",buyPrice:"",currentPrice:"",strategyGroup:"worker",strategyType:"standard",exitStrategy:"weekly_close",profitStrategy:"weekly_macd",customMA:""};
+  const [form, setForm] = useState(emptyForm);
+  const [editId, setEditId] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [error, setError] = useState("");
+  const [strategyTab, setStrategyTab] = useState("exit");
+  const [fetching, setFetching] = useState(false);
+  const [fetchMsg, setFetchMsg] = useState("");
 
-useEffect(()=>{localStorage.setItem(STORAGE_KEY,JSON.stringify(stocks));},[stocks]);
+  useEffect(()=>{localStorage.setItem(STORAGE_KEY,JSON.stringify(stocks));},[stocks]);
 
-const totalCost = stocks.reduce((s,st)=>s+st.shares*st.buyPrice,0);
-const totalValue = stocks.reduce((s,st)=>s+st.shares*st.currentPrice,0);
-const totalPnL = totalValue-totalCost;
-const totalPnLPct = totalCost>0?(totalPnL/totalCost)*100:0;
+  const totalCost = stocks.reduce((s,st)=>s+st.shares*st.buyPrice,0);
+  const total✓alue = stocks.reduce((s,st)=>s+st.shares*st.currentPrice,0);
+  const totalPnL = total✓alue-totalCost;
+  const totalPnLPct = totalCost>0?(totalPnL/totalCost)*100:0;
 
-function changeStrategyType(gk,tk){
-const stype=STRATEGY_GROUPS[gk]?.types[tk];
-setForm(f=>({…f,strategyGroup:gk,strategyType:tk,exitStrategy:stype?.exit[0]?.value||””,profitStrategy:stype?.profit[0]?.value||””,customMA:””}));
-}
+  function changeStrategyType(gk,tk){
+    const stype=STRATEGY_GROUPS[gk]?.types[tk];
+    setForm(f=>({...f,strategyGroup:gk,strategyType:tk,exitStrategy:stype?.exit[0]?.value||"",profitStrategy:stype?.profit[0]?.value||"",customMA:""}));
+  }
 
-async function fetchStock(symbol){
-if(!symbol||symbol.length<4)return;
-setFetching(true);setFetchMsg(“查詢中…”);
-try{
-const res=await fetch(`${API_URL}?symbol=${symbol}`);
-const data=await res.json();
-if(data.stat===“OK”&&data.data&&data.data.length>0){
-const latest=data.data[data.data.length-1];
-const closePrice=parseFloat(latest[6].replace(/,/g,””));
-const titleParts=data.title.split(” “).map(s=>s.trim()).filter(Boolean);
-const nameIdx=titleParts.findIndex(p=>p===symbol);
-const stockName=nameIdx>=0&&titleParts[nameIdx+1]?titleParts[nameIdx+1]:symbol;
-setForm(f=>({…f,name:f.name||stockName,currentPrice:isNaN(closePrice)?f.currentPrice:String(closePrice)}));
-setFetchMsg(`✅ ${stockName} 收盤價 $${closePrice}`);
-}else{setFetchMsg(“⚠️ 查無資料，請手動輸入”);}
-}catch(e){setFetchMsg(“❌ 查詢失敗，請手動輸入”);}
-setFetching(false);
-}
+  async function fetchStock(symbol){
+    if(!symbol||symbol.length<4)return;
+    setFetching(true);setFetchMsg("查詢中...");
+    try{
+      const res=await fetch(`${API_URL}?symbol=${symbol}`);
+      const data=await res.json();
+      if(data.stat==="OK"&&data.data&&data.data.length>0){
+        const latest=data.data[data.data.length-1];
+        const closePrice=parseFloat(latest[6].replace(/,/g,""));
+        const titleParts=data.title.split(" ").map(s=>s.trim()).filter(Boolean);
+        const nameIdx=titleParts.findIndex(p=>p===symbol);
+        const stockName=nameIdx≥0&&titleParts[nameIdx+1]?titleParts[nameIdx+1]:symbol;
+        setForm(f=>({...f,name:f.name||stockName,currentPrice:isNaN(closePrice)?f.currentPrice:String(closePrice)}));
+        setFetchMsg(`✅ ${stockName} 收盤價 $${closePrice}`);
+      }else{setFetchMsg("⚠️ 查無資料，請手動輸入");}
+    }catch(e){setFetchMsg("❌ 查詢失敗，請手動輸入");}
+    setFetching(false);
+  }
 
-async function fetchFridays(symbol) {
-try {
-const res = await fetch(`${API_URL.replace('/stock','/fridays')}?symbol=${symbol}`);
-const data = await res.json();
-return data;
-} catch(e) { return null; }
-}
+  async function fetchFridays(symbol) {
+    try {
+      const res = await fetch(`${API_URL.replace('/stock','/fridays')}?symbol=${symbol}`);
+      const data = await res.json();
+      return data;
+    } catch(e) { return null; }
+  }
 
-async function autoUpdateFridays(stockId, symbol) {
-const data = await fetchFridays(symbol);
-if (!data) return;
-setStocks(prev => prev.map(s => s.id === stockId ? {
-…s,
-refData: {
-…(s.refData || {}),
-thisWeekClose: data.thisWeekFriday ? String(data.thisWeekFriday.close) : s.refData?.thisWeekClose,
-lastWeekClose: data.lastWeekFriday ? String(data.lastWeekFriday.close) : s.refData?.lastWeekClose,
-thisWeekFridayDate: data.thisWeekFriday?.date || “”,
-lastWeekFridayDate: data.lastWeekFriday?.date || “”,
-}
-} : s));
-}
+  async function autoUpdateFridays(stockId, symbol) {
+    const data = await fetchFridays(symbol);
+    if (!data) return;
+    setStocks(prev => prev.map(s => s.id === stockId ? {
+      ...s,
+      refData: {
+        ...(s.refData || {}),
+        thisWeekClose: data.thisWeekFriday ? String(data.thisWeekFriday.close) : s.refData?.thisWeekClose,
+        lastWeekClose: data.lastWeekFriday ? String(data.lastWeekFriday.close) : s.refData?.lastWeekClose,
+        thisWeekFridayDate: data.thisWeekFriday?.date || "",
+        lastWeekFridayDate: data.lastWeekFriday?.date || "",
+      }
+    } : s));
+  }
 
-function openAdd(){setForm(emptyForm);setEditId(null);setError(””);setStrategyTab(“exit”);setFetchMsg(””);setShowForm(true);}
-function openEdit(stock){setForm({symbol:stock.symbol,name:stock.name,shares:stock.shares,buyPrice:stock.buyPrice,currentPrice:stock.currentPrice,strategyGroup:stock.strategyGroup||“worker”,strategyType:stock.strategyType||“standard”,exitStrategy:stock.exitStrategy||“weekly_close”,profitStrategy:stock.profitStrategy||“weekly_macd”,customMA:stock.customMA||””});setEditId(stock.id);setError(””);setStrategyTab(“exit”);setFetchMsg(””);setShowForm(true);}
+  function openAdd(){setForm(emptyForm);setEditId(null);setError("");setStrategyTab("exit");setFetchMsg("");setShowForm(true);}
+  function openEdit(stock){setForm({symbol:stock.symbol,name:stock.name,shares:stock.shares,buyPrice:stock.buyPrice,currentPrice:stock.currentPrice,strategyGroup:stock.strategyGroup||"worker",strategyType:stock.strategyType||"standard",exitStrategy:stock.exitStrategy||"weekly_close",profitStrategy:stock.profitStrategy||"weekly_macd",customMA:stock.customMA||""});setEditId(stock.id);setError("");setStrategyTab("exit");setFetchMsg("");setShowForm(true);}
 
-function handleSave(){
-if(!form.symbol.trim()||!form.shares||!form.buyPrice||!form.currentPrice){setError(“請填寫所有欄位”);return;}
-const parsed={symbol:form.symbol.trim().toUpperCase(),name:form.name.trim()||form.symbol.trim(),shares:parseFloat(form.shares),buyPrice:parseFloat(form.buyPrice),currentPrice:parseFloat(form.currentPrice),strategyGroup:form.strategyGroup,strategyType:form.strategyType,exitStrategy:form.exitStrategy,profitStrategy:form.profitStrategy,customMA:form.customMA,refData:{}};
-if(isNaN(parsed.shares)||isNaN(parsed.buyPrice)||isNaN(parsed.currentPrice)){setError(“數字格式不正確”);return;}
-if(editId!==null){setStocks(prev=>prev.map(s=>s.id===editId?{…s,…parsed,refData:s.refData||{}}:s));}
-else{setStocks(prev=>[…prev,{id:Date.now(),…parsed}]);}
-setShowForm(false);
-}
+  function handleSave(){
+    if(!form.symbol.trim()||!form.shares||!form.buyPrice||!form.currentPrice){setError("請填寫所有欄位");return;}
+    const parsed={symbol:form.symbol.trim().toUpperCase(),name:form.name.trim()||form.symbol.trim(),shares:parseFloat(form.shares),buyPrice:parseFloat(form.buyPrice),currentPrice:parseFloat(form.currentPrice),strategyGroup:form.strategyGroup,strategyType:form.strategyType,exitStrategy:form.exitStrategy,profitStrategy:form.profitStrategy,customMA:form.customMA,refData:{}};
+    if(isNaN(parsed.shares)||isNaN(parsed.buyPrice)||isNaN(parsed.currentPrice)){setError("數字格式不正確");return;}
+    if(editId!==null){setStocks(prev=>prev.map(s=>s.id===editId?{...s,...parsed,refData:s.refData||{}}:s));}
+    else{setStocks(prev=>[...prev,{id:Date.now(),...parsed}]);}
+    setShowForm(false);
+  }
 
-function handleUpdateRef(id,key,value){setStocks(prev=>prev.map(s=>s.id===id?{…s,refData:{…(s.refData||{}),[key]:value}}:s));}
+  function handleUpdateRef(id,key,value){setStocks(prev=>prev.map(s=>s.id===id?{...s,refData:{...(s.refData||{}),[key]:value}}:s));}
 
-const inp={width:“100%”,padding:“10px 14px”,borderRadius:10,border:“1.5px solid #e2e8f0”,fontSize:14,outline:“none”,boxSizing:“border-box”,color:”#0f172a”};
-const currentStype = getStrategyType(form.strategyGroup,form.strategyType);
+  const inp={width:"100%",padding:"10px 14px",borderRadius:10,border:"1.5px solid #e2e8f0",fontSize:14,outline:"none",boxSizing:"border-box",color:"#0f172a"};
+  const currentStype = getStrategyType(form.strategyGroup,form.strategyType);
 
-return (
-<div style={{minHeight:“100vh”,background:“linear-gradient(135deg,#0f172a 0%,#1e293b 60%,#0f4c75 100%)”,fontFamily:”‘PingFang TC’,sans-serif”,padding:“24px 16px 48px”}}>
-<div style={{maxWidth:700,margin:“0 auto”}}>
+  return (
+    <div style={{minHeight:"100vh",background:"linear-gradient(135deg,#0f172a 0%,#1e293b 60%,#0f4c75 100%)",fontFamily:"'PingFang TC',sans-serif",padding:"24px 16px 48px"}}>
+      <div style={{maxWidth:700,margin:"0 auto"}}>
 
-```
-    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:24}}>
-      <div>
-        <div style={{color:"#94a3b8",fontSize:13,letterSpacing:2,textTransform:"uppercase",marginBottom:4}}>Portfolio</div>
-        <h1 style={{color:"#f8fafc",fontSize:28,fontWeight:800,margin:0}}>我的股票</h1>
-      </div>
-      <button onClick={openAdd} style={{background:"#3b82f6",color:"#fff",border:"none",borderRadius:12,padding:"10px 20px",fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(59,130,246,0.4)"}}>＋ 新增</button>
-    </div>
+        <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",marginBottom:24}}>
+          <div>
+            <div style={{color:"#94a3b8",fontSize:13,letterSpacing:2,textTransform:"uppercase",marginBottom:4}}>Portfolio</div>
+            <h1 style={{color:"#f8fafc",fontSize:28,fontWeight:800,margin:0}}>我的股票</h1>
+          </div>
+          <button onClick={openAdd} style={{background:"#3b82f6",color:"#fff",border:"none",borderRadius:12,padding:"10px 20px",fontSize:15,fontWeight:700,cursor:"pointer",boxShadow:"0 4px 12px rgba(59,130,246,0.4)"}}>＋ 新增</button>
+        </div>
 
-    <div style={{background:"rgba(255,255,255,0.07)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:20,padding:24,marginBottom:24}}>
-      <div style={{color:"#94a3b8",fontSize:13,marginBottom:8}}>總市值</div>
-      <div style={{color:"#f8fafc",fontSize:36,fontWeight:800,letterSpacing:-1,marginBottom:16}}>$ {fmt(totalValue)}</div>
-      <div style={{display:"flex",gap:32}}>
-        <div><div style={{color:"#64748b",fontSize:12,marginBottom:4}}>成本</div><div style={{color:"#cbd5e1",fontSize:16,fontWeight:600}}>$ {fmt(totalCost)}</div></div>
-        <div><div style={{color:"#64748b",fontSize:12,marginBottom:4}}>損益</div><div style={{color:totalPnL>=0?"#34d399":"#f87171",fontSize:16,fontWeight:700}}>{totalPnL>=0?"+":""}{fmt(totalPnL)} ({totalPnLPct>=0?"+":""}{fmt(totalPnLPct)}%)</div></div>
-        <div><div style={{color:"#64748b",fontSize:12,marginBottom:4}}>持股數</div><div style={{color:"#cbd5e1",fontSize:16,fontWeight:600}}>{stocks.length} 檔</div></div>
-      </div>
-    </div>
-
-    {stocks.length===0&&<div style={{textAlign:"center",color:"#475569",padding:"48px 0"}}>尚無股票，點擊「＋ 新增」開始追蹤</div>}
-
-    {stocks.map(stock=>{
-      const cost=stock.shares*stock.buyPrice;
-      const value=stock.shares*stock.currentPrice;
-      const pnl=value-cost;
-      const pnlPct=cost>0?(pnl/cost)*100:0;
-      const isPos=pnl>=0;
-      return (
-        <div key={stock.id} style={{background:"#fff",borderRadius:16,boxShadow:"0 2px 16px rgba(15,23,42,0.08)",padding:"20px 24px",marginBottom:16,position:"relative",overflow:"hidden"}}>
-          <div style={{position:"absolute",left:0,top:0,bottom:0,width:4,background:isPos?"#10b981":"#ef4444",borderRadius:"4px 0 0 4px"}}/>
-          <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",paddingLeft:8}}>
-            <div style={{flex:1}}>
-              <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
-                <span style={{background:"#1e293b",color:"#94a3b8",borderRadius:8,padding:"2px 10px",fontSize:13,fontWeight:700}}>{stock.symbol}</span>
-                <span style={{color:"#475569",fontSize:14}}>{stock.name}</span>
-              </div>
-              <div style={{display:"flex",gap:24,marginTop:10,flexWrap:"wrap"}}>
-                {[["持股",stock.shares.toLocaleString()],["買入價",fmt(stock.buyPrice)],["現價",fmt(stock.currentPrice)],["市值",fmt(value)]].map(([l,v])=>(
-                  <div key={l}><div style={{color:"#9ca3af",fontSize:11,marginBottom:2}}>{l}</div><div style={{color:"#374151",fontSize:15,fontWeight:600}}>{v}</div></div>
-                ))}
-              </div>
-              <div style={{marginTop:12,display:"flex",alignItems:"center",gap:10}}>
-                <span style={{display:"inline-flex",alignItems:"center",gap:3,padding:"2px 10px",borderRadius:20,fontSize:13,fontWeight:700,background:isPos?"#d1fae5":"#fee2e2",color:isPos?"#065f46":"#991b1b"}}>{isPos?"▲":"▼"} {fmt(Math.abs(pnl))}</span>
-                <span style={{color:isPos?"#059669":"#dc2626",fontSize:13,fontWeight:600}}>{pnlPct>=0?"+":""}{fmt(pnlPct)}%</span>
-                <div style={{flex:1,height:4,background:"#f1f5f9",borderRadius:4,overflow:"hidden"}}>
-                  <div style={{height:"100%",width:`${Math.min(Math.abs(pnlPct)*4,100)}%`,background:isPos?"#10b981":"#ef4444",borderRadius:4}}/>
-                </div>
-              </div>
-              <StrategyPanel stock={stock} pnlPct={pnlPct} onUpdateRef={handleUpdateRef}/>
-            </div>
-            <div style={{display:"flex",flexDirection:"column",gap:6,marginLeft:12}}>
-              <button onClick={()=>openEdit(stock)} style={{background:"#f1f5f9",border:"none",borderRadius:8,padding:"6px 12px",fontSize:13,color:"#475569",cursor:"pointer",fontWeight:600}}>編輯</button>
-              <button onClick={()=>autoUpdateFridays(stock.id, stock.symbol)} style={{background:"#eff6ff",border:"none",borderRadius:8,padding:"6px 12px",fontSize:13,color:"#3b82f6",cursor:"pointer",fontWeight:600}}>📅更新</button>
-              <button onClick={()=>setStocks(p=>p.filter(s=>s.id!==stock.id))} style={{background:"#fff0f0",border:"none",borderRadius:8,padding:"6px 12px",fontSize:13,color:"#ef4444",cursor:"pointer",fontWeight:600}}>刪除</button>
-            </div>
+        <div style={{background:"rgba(255,255,255,0.07)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:20,padding:24,marginBottom:24}}>
+          <div style={{color:"#94a3b8",fontSize:13,marginBottom:8}}>總市值</div>
+          <div style={{color:"#f8fafc",fontSize:36,fontWeight:800,letterSpacing:-1,marginBottom:16}}>$ {fmt(total✓alue)}</div>
+          <div style={{display:"flex",gap:32}}>
+            <div><div style={{color:"#64748b",fontSize:12,marginBottom:4}}>成本</div><div style={{color:"#cbd5e1",fontSize:16,fontWeight:600}}>$ {fmt(totalCost)}</div></div>
+            <div><div style={{color:"#64748b",fontSize:12,marginBottom:4}}>損益</div><div style={{color:totalPnL≥0?"#34d399":"#f87171",fontSize:16,fontWeight:700}}>{totalPnL≥0?"+":""}{fmt(totalPnL)} ({totalPnLPct≥0?"+":""}{fmt(totalPnLPct)}%)</div></div>
+            <div><div style={{color:"#64748b",fontSize:12,marginBottom:4}}>持股數</div><div style={{color:"#cbd5e1",fontSize:16,fontWeight:600}}>{stocks.length} 檔</div></div>
           </div>
         </div>
-      );
-    })}
 
-    {showForm&&(
-      <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.65)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,padding:16}} onClick={e=>{if(e.target===e.currentTarget)setShowForm(false);}}>
-        <div style={{background:"#fff",borderRadius:20,padding:28,width:"100%",maxWidth:460,boxShadow:"0 24px 64px rgba(0,0,0,0.3)",maxHeight:"92vh",overflowY:"auto"}}>
-          <h2 style={{margin:"0 0 16px",fontSize:20,fontWeight:800,color:"#0f172a"}}>{editId!==null?"編輯股票":"新增股票"}</h2>
+        {stocks.length===0&&<div style={{textAlign:"center",color:"#475569",padding:"48px 0"}}>尚無股票，點擊「＋ 新增」開始追蹤</div>}
 
-          <div style={{marginBottom:10}}>
-            <label style={{display:"block",fontSize:12,color:"#64748b",marginBottom:4,fontWeight:700}}>股票代碼</label>
-            <div style={{display:"flex",gap:8}}>
-              <input value={form.symbol} onChange={e=>{setForm(f=>({...f,symbol:e.target.value}));setFetchMsg("");}} placeholder="e.g. 2330" style={{...inp,flex:1}}/>
-              <button onClick={()=>fetchStock(form.symbol)} disabled={fetching} style={{padding:"0 14px",borderRadius:10,border:"none",cursor:fetching?"not-allowed":"pointer",background:fetching?"#e2e8f0":"#0f172a",color:fetching?"#94a3b8":"#fff",fontSize:13,fontWeight:700,whiteSpace:"nowrap",flexShrink:0}}>
-                {fetching?"查詢中...":"🔍 查詢"}
-              </button>
-            </div>
-            {fetchMsg&&<div style={{fontSize:11,marginTop:5,color:fetchMsg.startsWith("✅")?"#059669":fetchMsg.startsWith("⚠️")?"#d97706":"#dc2626"}}>{fetchMsg}</div>}
-          </div>
-
-          <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>
-            {[["name","股票名稱","e.g. 台積電"],["shares","持股數量","e.g. 100"],["buyPrice","買入價格","e.g. 850"],["currentPrice","現在價格","e.g. 920"]].map(([key,label,ph])=>(
-              <div key={key}>
-                <label style={{display:"block",fontSize:12,color:"#64748b",marginBottom:4,fontWeight:700}}>{label}</label>
-                <input value={form[key]} onChange={e=>setForm(f=>({...f,[key]:e.target.value}))} placeholder={ph} style={inp}/>
-              </div>
-            ))}
-          </div>
-
-          <div style={{background:"#f8fafc",borderRadius:12,padding:16,border:"1px solid #e2e8f0",marginBottom:14}}>
-            <div style={{fontSize:13,fontWeight:800,color:"#1e293b",marginBottom:12}}>📋 操作策略設定</div>
-            {Object.entries(STRATEGY_GROUPS).map(([gk,group])=>(
-              <div key={gk} style={{marginBottom:12}}>
-                <div style={{display:"inline-flex",alignItems:"center",gap:6,background:group.color+"18",color:group.color,border:`1px solid ${group.color}40`,borderRadius:20,padding:"3px 12px",fontSize:12,fontWeight:800,marginBottom:8}}>{group.icon} {group.label}</div>
-                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
-                  {Object.entries(group.types).map(([tk,stype])=>{
-                    const selected=form.strategyGroup===gk&&form.strategyType===tk;
-                    return <button key={tk} onClick={()=>changeStrategyType(gk,tk)} style={{padding:"10px 12px",borderRadius:10,cursor:"pointer",textAlign:"left",border:selected?`2px solid ${group.color}`:"2px solid #e2e8f0",background:selected?group.color+"12":"#fff"}}>
-                      <div style={{fontSize:13,fontWeight:800,color:selected?group.color:"#374151"}}>{stype.icon} {stype.label}</div>
-                      <div style={{fontSize:10,color:"#94a3b8",marginTop:3,lineHeight:1.4}}>{stype.description}</div>
-                    </button>;
-                  })}
+        {stocks.map(stock=>{
+          const cost=stock.shares*stock.buyPrice;
+          const value=stock.shares*stock.currentPrice;
+          const pnl=value-cost;
+          const pnlPct=cost>0?(pnl/cost)*100:0;
+          const isPos=pnl≥0;
+          return (
+            <div key={stock.id} style={{background:"#fff",borderRadius:16,boxShadow:"0 2px 16px rgba(15,23,42,0.08)",padding:"20px 24px",marginBottom:16,position:"relative",overflow:"hidden"}}>
+              <div style={{position:"absolute",left:0,top:0,bottom:0,width:4,background:isPos?"#10b981":"#ef4444",borderRadius:"4px 0 0 4px"}}/>
+              <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start",paddingLeft:8}}>
+                <div style={{flex:1}}>
+                  <div style={{display:"flex",alignItems:"center",gap:8,marginBottom:4}}>
+                    <span style={{background:"#1e293b",color:"#94a3b8",borderRadius:8,padding:"2px 10px",fontSize:13,fontWeight:700}}>{stock.symbol}</span>
+                    <span style={{color:"#475569",fontSize:14}}>{stock.name}</span>
+                  </div>
+                  <div style={{display:"flex",gap:24,marginTop:10,flexWrap:"wrap"}}>
+                    {[["持股",stock.shares.toLocaleString()],["買入價",fmt(stock.buyPrice)],["現價",fmt(stock.currentPrice)],["市值",fmt(value)]].map(([l,v])=>(
+                      <div key={l}><div style={{color:"#9ca3af",fontSize:11,marginBottom:2}}>{l}</div><div style={{color:"#374151",fontSize:15,fontWeight:600}}>{v}</div></div>
+                    ))}
+                  </div>
+                  <div style={{marginTop:12,display:"flex",alignItems:"center",gap:10}}>
+                    <span style={{display:"inline-flex",alignItems:"center",gap:3,padding:"2px 10px",borderRadius:20,fontSize:13,fontWeight:700,background:isPos?"#d1fae5":"#fee2e2",color:isPos?"#065f46":"#991b1b"}}>{isPos?"▲":"▼"} {fmt(Math.abs(pnl))}</span>
+                    <span style={{color:isPos?"#059669":"#dc2626",fontSize:13,fontWeight:600}}>{pnlPct≥0?"+":""}{fmt(pnlPct)}%</span>
+                    <div style={{flex:1,height:4,background:"#f1f5f9",borderRadius:4,overflow:"hidden"}}>
+                      <div style={{height:"100%",width:`${Math.min(Math.abs(pnlPct)*4,100)}%`,background:isPos?"#10b981":"#ef4444",borderRadius:4}}/>
+                    </div>
+                  </div>
+                  <StrategyPanel stock={stock} pnlPct={pnlPct} onUpdateRef={handleUpdateRef}/>
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:6,marginLeft:12}}>
+                  <button onClick={()=>openEdit(stock)} style={{background:"#f1f5f9",border:"none",borderRadius:8,padding:"6px 12px",fontSize:13,color:"#475569",cursor:"pointer",fontWeight:600}}>編輯</button>
+                  <button onClick={()=>autoUpdateFridays(stock.id, stock.symbol)} style={{background:"#eff6ff",border:"none",borderRadius:8,padding:"6px 12px",fontSize:13,color:"#3b82f6",cursor:"pointer",fontWeight:600}}>📅 更新</button>
+                  <button onClick={()=>setStocks(p=>p.filter(s=>s.id!==stock.id))} style={{background:"#fff0f0",border:"none",borderRadius:8,padding:"6px 12px",fontSize:13,color:"#ef4444",cursor:"pointer",fontWeight:600}}>刪除</button>
                 </div>
               </div>
-            ))}
-            <div style={{borderTop:"1px solid #e2e8f0",paddingTop:14,marginTop:4}}>
-              <div style={{display:"flex",gap:8,marginBottom:12}}>
-                {[{id:"exit",label:form.strategyGroup==="boss"?"🔴 停損點":"🛡️ 出場點",sub:form.strategyGroup==="boss"?"長線停損 SOP":"獲利 < 10% 或負值"},{id:"profit",label:"🎯 停利點",sub:form.strategyGroup==="boss"?"日線級別判斷":"獲利 ≥ 10%"}].map(tab=>(
-                  <button key={tab.id} onClick={()=>setStrategyTab(tab.id)} style={{flex:1,padding:"8px 10px",borderRadius:10,cursor:"pointer",border:strategyTab===tab.id?(tab.id==="exit"?(form.strategyGroup==="boss"?"2px solid #ef4444":"2px solid #3b82f6"):"2px solid #f59e0b"):"2px solid #e2e8f0",background:strategyTab===tab.id?(tab.id==="exit"?(form.strategyGroup==="boss"?"#fff0f0":"#eff6ff"):"#fffbeb"):"#fff"}}>
-                    <div style={{fontSize:12,fontWeight:700,color:strategyTab===tab.id?(tab.id==="exit"?(form.strategyGroup==="boss"?"#991b1b":"#1d4ed8"):"#92400e"):"#64748b"}}>{tab.label}</div>
-                    <div style={{fontSize:10,color:"#94a3b8",marginTop:2}}>{tab.sub}</div>
+            </div>
+          );
+        })}
+
+        {showForm&&(
+          <div style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.65)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:100,padding:16}} onClick={e=>{if(e.target===e.currentTarget)setShowForm(false);}}>
+            <div style={{background:"#fff",borderRadius:20,padding:28,width:"100%",maxWidth:460,boxShadow:"0 24px 64px rgba(0,0,0,0.3)",maxHeight:"92vh",overflowY:"auto"}}>
+              <h2 style={{margin:"0 0 16px",fontSize:20,fontWeight:800,color:"#0f172a"}}>{editId!==null?"編輯股票":"新增股票"}</h2>
+
+              <div style={{marginBottom:10}}>
+                <label style={{display:"block",fontSize:12,color:"#64748b",marginBottom:4,fontWeight:700}}>股票代碼</label>
+                <div style={{display:"flex",gap:8}}>
+                  <input value={form.symbol} onChange={e=>{setForm(f=>({...f,symbol:e.target.value}));setFetchMsg("");}} placeholder="e.g. 2330" style={{...inp,flex:1}}/>
+                  <button onClick={()=>fetchStock(form.symbol)} disabled={fetching} style={{padding:"0 14px",borderRadius:10,border:"none",cursor:fetching?"not-allowed":"pointer",background:fetching?"#e2e8f0":"#0f172a",color:fetching?"#94a3b8":"#fff",fontSize:13,fontWeight:700,whiteSpace:"nowrap",flexShrink:0}}>
+                    {fetching?"查詢中...":"🔍 查詢"}
                   </button>
+                </div>
+                {fetchMsg&&<div style={{fontSize:11,marginTop:5,color:fetchMsg.startsWith("✅")?"#059669":fetchMsg.startsWith("⚠️")?"#d97706":"#dc2626"}}>{fetchMsg}</div>}
+              </div>
+
+              <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10,marginBottom:16}}>
+                {[["name","股票名稱","e.g. 台積電"],["shares","持股數量","e.g. 100"],["buyPrice","買入價格","e.g. 850"],["currentPrice","現在價格","e.g. 920"]].map(([key,label,ph])=>(
+                  <div key={key}>
+                    <label style={{display:"block",fontSize:12,color:"#64748b",marginBottom:4,fontWeight:700}}>{label}</label>
+                    <input value={form[key]} onChange={e=>setForm(f=>({...f,[key]:e.target.value}))} placeholder={ph} style={inp}/>
+                  </div>
                 ))}
               </div>
-              {strategyTab==="exit"&&currentStype&&(
-                <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                  <div style={{fontSize:11,color:"#94a3b8",marginBottom:2}}>{form.strategyGroup==="boss"?"擇一選擇停損條件：":"擇一選擇出場條件："}</div>
-                  {currentStype.exit.map(opt=>(
-                    <label key={opt.value} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"10px 12px",borderRadius:10,cursor:"pointer",border:form.exitStrategy===opt.value?"1.5px solid #3b82f6":"1.5px solid #e2e8f0",background:form.exitStrategy===opt.value?"#eff6ff":"#fff"}}>
-                      <input type="radio" name="exit" value={opt.value} checked={form.exitStrategy===opt.value} onChange={()=>setForm(f=>({...f,exitStrategy:opt.value}))} style={{accentColor:"#3b82f6",marginTop:2}}/>
-                      <span style={{fontSize:13,fontWeight:600,color:form.exitStrategy===opt.value?"#1d4ed8":"#374151",lineHeight:1.5}}>{opt.label}</span>
-                    </label>
-                  ))}
-                  {form.exitStrategy==="custom_ma"&&<div style={{marginTop:4}}><label style={{display:"block",fontSize:12,color:"#64748b",marginBottom:4,fontWeight:700}}>自訂均線（例：MA20、MA60）</label><input value={form.customMA} onChange={e=>setForm(f=>({...f,customMA:e.target.value}))} placeholder="e.g. MA20" style={inp}/></div>}
+
+              <div style={{background:"#f8fafc",borderRadius:12,padding:16,border:"1px solid #e2e8f0",marginBottom:14}}>
+                <div style={{fontSize:13,fontWeight:800,color:"#1e293b",marginBottom:12}}>📋 操作策略設定</div>
+                {Object.entries(STRATEGY_GROUPS).map(([gk,group])=>(
+                  <div key={gk} style={{marginBottom:12}}>
+                    <div style={{display:"inline-flex",alignItems:"center",gap:6,background:group.color+"18",color:group.color,border:`1px solid ${group.color}40`,borderRadius:20,padding:"3px 12px",fontSize:12,fontWeight:800,marginBottom:8}}>{group.label}</div>
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                      {Object.entries(group.types).map(([tk,stype])=>{
+                        const selected=form.strategyGroup===gk&&form.strategyType===tk;
+                        return <button key={tk} onClick={()=>changeStrategyType(gk,tk)} style={{padding:"10px 12px",borderRadius:10,cursor:"pointer",textAlign:"left",border:selected?`2px solid ${group.color}`:"2px solid #e2e8f0",background:selected?group.color+"12":"#fff"}}>
+                          <div style={{fontSize:13,fontWeight:800,color:selected?group.color:"#374151"}}>{stype.label}</div>
+                          <div style={{fontSize:10,color:"#94a3b8",marginTop:3,lineHeight:1.4}}>{stype.description}</div>
+                        </button>;
+                      })}
+                    </div>
+                  </div>
+                ))}
+                <div style={{borderTop:"1px solid #e2e8f0",paddingTop:14,marginTop:4}}>
+                  <div style={{display:"flex",gap:8,marginBottom:12}}>
+                    {[{id:"exit",label:form.strategyGroup==="boss"?"🔴 停損點":"🛡️ 出場點",sub:form.strategyGroup==="boss"?"長線停損 SOP":"獲利 < 10% 或負值"},{id:"profit",label:"🎯 停利點",sub:form.strategyGroup==="boss"?"日線級別判斷":"獲利 ≥ 10%"}].map(tab=>(
+                      <button key={tab.id} onClick={()=>setStrategyTab(tab.id)} style={{flex:1,padding:"8px 10px",borderRadius:10,cursor:"pointer",border:strategyTab===tab.id?(tab.id==="exit"?(form.strategyGroup==="boss"?"2px solid #ef4444":"2px solid #3b82f6"):"2px solid #f59e0b"):"2px solid #e2e8f0",background:strategyTab===tab.id?(tab.id==="exit"?(form.strategyGroup==="boss"?"#fff0f0":"#eff6ff"):"#fffbeb"):"#fff"}}>
+                        <div style={{fontSize:12,fontWeight:700,color:strategyTab===tab.id?(tab.id==="exit"?(form.strategyGroup==="boss"?"#991b1b":"#1d4ed8"):"#92400e"):"#64748b"}}>{tab.label}</div>
+                        <div style={{fontSize:10,color:"#94a3b8",marginTop:2}}>{tab.sub}</div>
+                      </button>
+                    ))}
+                  </div>
+                  {strategyTab==="exit"&&currentStype&&(
+                    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                      <div style={{fontSize:11,color:"#94a3b8",marginBottom:2}}>{form.strategyGroup==="boss"?"擇一選擇停損條件：":"擇一選擇出場條件："}</div>
+                      {currentStype.exit.map(opt=>(
+                        <label key={opt.value} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"10px 12px",borderRadius:10,cursor:"pointer",border:form.exitStrategy===opt.value?"1.5px solid #3b82f6":"1.5px solid #e2e8f0",background:form.exitStrategy===opt.value?"#eff6ff":"#fff"}}>
+                          <input type="radio" name="exit" value={opt.value} checked={form.exitStrategy===opt.value} onChange={()=>setForm(f=>({...f,exitStrategy:opt.value}))} style={{accentColor:"#3b82f6",marginTop:2}}/>
+                          <span style={{fontSize:13,fontWeight:600,color:form.exitStrategy===opt.value?"#1d4ed8":"#374151",lineHeight:1.5}}>{opt.label}</span>
+                        </label>
+                      ))}
+                      {form.exitStrategy==="custom_ma"&&<div style={{marginTop:4}}><label style={{display:"block",fontSize:12,color:"#64748b",marginBottom:4,fontWeight:700}}>自訂均線（例：MA20、MA60）</label><input value={form.customMA} onChange={e=>setForm(f=>({...f,customMA:e.target.value}))} placeholder="e.g. MA20" style={inp}/></div>}
+                    </div>
+                  )}
+                  {strategyTab==="profit"&&currentStype&&(
+                    <div style={{display:"flex",flexDirection:"column",gap:8}}>
+                      <div style={{fontSize:11,color:"#94a3b8",marginBottom:2}}>擇一選擇停利條件：</div>
+                      {currentStype.profit.map(opt=>(
+                        <label key={opt.value} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"10px 12px",borderRadius:10,cursor:"pointer",border:form.profitStrategy===opt.value?"1.5px solid #f59e0b":"1.5px solid #e2e8f0",background:form.profitStrategy===opt.value?"#fffbeb":"#fff"}}>
+                          <input type="radio" name="profit" value={opt.value} checked={form.profitStrategy===opt.value} onChange={()=>setForm(f=>({...f,profitStrategy:opt.value}))} style={{accentColor:"#f59e0b",marginTop:2}}/>
+                          <span style={{fontSize:13,fontWeight:600,color:form.profitStrategy===opt.value?"#92400e":"#374151",lineHeight:1.5}}>{opt.label}</span>
+                        </label>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-              {strategyTab==="profit"&&currentStype&&(
-                <div style={{display:"flex",flexDirection:"column",gap:8}}>
-                  <div style={{fontSize:11,color:"#94a3b8",marginBottom:2}}>擇一選擇停利條件：</div>
-                  {currentStype.profit.map(opt=>(
-                    <label key={opt.value} style={{display:"flex",alignItems:"flex-start",gap:10,padding:"10px 12px",borderRadius:10,cursor:"pointer",border:form.profitStrategy===opt.value?"1.5px solid #f59e0b":"1.5px solid #e2e8f0",background:form.profitStrategy===opt.value?"#fffbeb":"#fff"}}>
-                      <input type="radio" name="profit" value={opt.value} checked={form.profitStrategy===opt.value} onChange={()=>setForm(f=>({...f,profitStrategy:opt.value}))} style={{accentColor:"#f59e0b",marginTop:2}}/>
-                      <span style={{fontSize:13,fontWeight:600,color:form.profitStrategy===opt.value?"#92400e":"#374151",lineHeight:1.5}}>{opt.label}</span>
-                    </label>
-                  ))}
-                </div>
-              )}
+              </div>
+
+              {error&&<div style={{color:"#ef4444",fontSize:13,marginBottom:10}}>{error}</div>}
+              <div style={{display:"flex",gap:10}}>
+                <button onClick={()=>setShowForm(false)} style={{flex:1,padding:12,borderRadius:10,border:"1.5px solid #e2e8f0",background:"#fff",fontSize:15,fontWeight:600,color:"#64748b",cursor:"pointer"}}>取消</button>
+                <button onClick={handleSave} style={{flex:1,padding:12,borderRadius:10,border:"none",background:"#3b82f6",fontSize:15,fontWeight:700,color:"#fff",cursor:"pointer"}}>儲存</button>
+              </div>
             </div>
           </div>
-
-          {error&&<div style={{color:"#ef4444",fontSize:13,marginBottom:10}}>{error}</div>}
-          <div style={{display:"flex",gap:10}}>
-            <button onClick={()=>setShowForm(false)} style={{flex:1,padding:12,borderRadius:10,border:"1.5px solid #e2e8f0",background:"#fff",fontSize:15,fontWeight:600,color:"#64748b",cursor:"pointer"}}>取消</button>
-            <button onClick={handleSave} style={{flex:1,padding:12,borderRadius:10,border:"none",background:"#3b82f6",fontSize:15,fontWeight:700,color:"#fff",cursor:"pointer"}}>儲存</button>
-          </div>
-        </div>
+        )}
       </div>
-    )}
-  </div>
-</div>
-```
-
-);
+    </div>
+  );
 }
 
-ReactDOM.createRoot(document.getElementById(‘root’)).render(<App/>);
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
 </script>
-
 </body>
 </html>
