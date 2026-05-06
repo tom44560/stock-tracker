@@ -249,16 +249,23 @@ async function fetchStock() {
 
 async function autoUpdateFridays(stockId, symbol) {
   try {
-    const res=await fetch(`${API}/fridays?symbol=${symbol}`);
-    const data=await res.json();
     const s=stocks.find(s=>s.id===stockId);
-    if(s&&data){
-      s.refData=s.refData||{};
-      if(data.thisWeekFriday)s.refData.thisWeekClose=String(data.thisWeekFriday.close);
-      if(data.lastWeekFriday)s.refData.lastWeekClose=String(data.lastWeekFriday.close);
-    }
-    save();render();
-  } catch(e) { alert("更新失敗"); }
+    if(!s) return;
+    // Show loading
+    s._updating=true; render();
+    const res=await fetch(`${API}/quote?symbol=${symbol}`);
+    const data=await res.json();
+    s.refData=s.refData||{};
+    if(data.close) s.currentPrice=data.close;
+    if(data.ma5) s.refData.ma5=String(data.ma5);
+    if(data.ma10) s.refData.ma10=String(data.ma10);
+    if(data.ma20) s.refData.ma20=String(data.ma20);
+    if(data.lastWeekFriday) s.refData.lastWeekClose=String(data.lastWeekFriday.close);
+    if(data.thisWeekFriday) s.refData.thisWeekClose=String(data.thisWeekFriday.close);
+    s._updating=false;
+    save(); render();
+    alert("✅ 已更新：收盤$"+data.close+" MA5:"+data.ma5+" MA10:"+data.ma10+" MA20:"+data.ma20);
+  } catch(e) { alert("更新失敗："+e.message); }
 }
 
 function openAdd() {
@@ -396,10 +403,7 @@ function render() {
           <div><div class="strategy-box-title" style="color:${eT?'#1e40af':'#374151'}">獲利未達 10% — 出場點監控中</div><div class="strategy-box-sub" style="color:${eT?'#1d4ed8':'#94a3b8'}">觀察：${exitLabel}</div></div>
         </div>`;
       }
-      strategyHTML+=`<div class="tag-row">
-        <span class="tag" style="background:${!isHighProfit?'#dbeafe':'#f1f5f9'};color:${!isHighProfit?'#1d4ed8':'#94a3b8'};border:1px solid ${!isHighProfit?'#93c5fd':'#e2e8f0'}">🛡️ 出場：${exitLabel}</span>
-        <span class="tag" style="background:${isHighProfit?'#fef3c7':'#f1f5f9'};color:${isHighProfit?'#92400e':'#94a3b8'};border:1px solid ${isHighProfit?'#fbbf24':'#e2e8f0'}">🎯 停利：${profitLabel}</span>
-      </div>`;
+
     }
 
     // ref fields
@@ -440,6 +444,7 @@ function render() {
             <div><div class="stat-label">持股</div><div class="stat-value">${stock.shares.toLocaleString()}</div></div>
             <div><div class="stat-label">買入價</div><div class="stat-value">${fmt(stock.buyPrice)}</div></div>
             <div><div class="stat-label">現價</div><div class="stat-value">${fmt(stock.currentPrice)}</div></div>
+            ${stock.refData?.lastWeekClose?`<div><div class="stat-label">上週五收盤</div><div class="stat-value">${fmt(stock.refData.lastWeekClose)}</div></div>`:''}
             <div><div class="stat-label">市值</div><div class="stat-value">${fmt(value)}</div></div>
           </div>
           <div class="pnl-row">
@@ -451,7 +456,7 @@ function render() {
         </div>
         <div class="card-actions">
           <button class="btn-edit" onclick="openEdit(stocks.find(s=>s.id===${stock.id}))">編輯</button>
-          <button class="btn-update" onclick="autoUpdateFridays(${stock.id},'${stock.symbol}')">📅 更新</button>
+          <button class="btn-update" onclick="autoUpdateFridays(${stock.id},'${stock.symbol}')" ${stock._updating?'disabled':''} style="${stock._updating?'opacity:0.5':''}">📅 ${stock._updating?'更新中...':'更新'}</button>
           <button class="btn-delete" onclick="deleteStock(${stock.id})">刪除</button>
         </div>
       </div>
