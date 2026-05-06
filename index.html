@@ -206,8 +206,14 @@ async function fetchStock(symbol) {
       if(!form.name)form.name=stockName;
       if(!isNaN(closePrice))form.currentPrice=String(closePrice);
       fetchMsg="✅ "+stockName+" 收盤價 $"+closePrice;
-    } else { fetchMsg="⚠️ 查無資料，請手動輸入"; }
-  } catch(e) { fetchMsg="❌ 查詢失敗，請手動輸入"; }
+      render();
+      // After render, directly update input values
+      const nameInput=document.querySelector('input[placeholder="e.g. 台積電"]');
+      const priceInput=document.querySelector('input[placeholder="e.g. 920"]');
+      if(nameInput&&!nameInput.value)nameInput.value=stockName;
+      if(priceInput&&!isNaN(closePrice))priceInput.value=closePrice;
+    } else { fetchMsg="⚠️ 查無資料，請手動輸入"; render(); }
+  } catch(e) { fetchMsg="❌ 查詢失敗，請手動輸入"; render(); }
   fetching=false;render();
 }
 
@@ -484,5 +490,4 @@ render();
 </script>
 
 </body>
-</html>
 </html>
