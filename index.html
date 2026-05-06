@@ -207,10 +207,9 @@ async function fetchStock(symbol) {
       if(!isNaN(closePrice))form.currentPrice=String(closePrice);
       fetchMsg="✅ "+stockName+" 收盤價 $"+closePrice;
       render();
-      // After render, directly update input values
-      const nameInput=document.querySelector('input[placeholder="e.g. 台積電"]');
-      const priceInput=document.querySelector('input[placeholder="e.g. 920"]');
-      if(nameInput&&!nameInput.value)nameInput.value=stockName;
+      const nameInput=document.getElementById('input-name');
+      const priceInput=document.getElementById('input-price');
+      if(nameInput&&!form.name)nameInput.value=stockName;
       if(priceInput&&!isNaN(closePrice))priceInput.value=closePrice;
     } else { fetchMsg="⚠️ 查無資料，請手動輸入"; render(); }
   } catch(e) { fetchMsg="❌ 查詢失敗，請手動輸入"; render(); }
@@ -414,10 +413,10 @@ function render() {
         ${fetchMsg?`<div class="fetch-msg" style="color:${fetchMsg.startsWith('✅')?'#059669':fetchMsg.startsWith('⚠️')?'#d97706':'#dc2626'}">${fetchMsg}</div>`:''}
       </div>
       <div class="field-grid">
-        <div><label class="field-label">股票名稱</label><input class="field-input" value="${form.name||''}" oninput="form.name=this.value" placeholder="e.g. 台積電"></div>
+        <div><label class="field-label">股票名稱</label><input class="field-input" id="input-name" value="${form.name||''}" oninput="form.name=this.value" placeholder="e.g. 台積電"></div>
         <div><label class="field-label">持股數量</label><input class="field-input" type="number" value="${form.shares||''}" oninput="form.shares=this.value" placeholder="e.g. 100"></div>
         <div><label class="field-label">買入價格</label><input class="field-input" type="number" value="${form.buyPrice||''}" oninput="form.buyPrice=this.value" placeholder="e.g. 850"></div>
-        <div><label class="field-label">現在價格</label><input class="field-input" type="number" value="${form.currentPrice||''}" oninput="form.currentPrice=this.value" placeholder="e.g. 920"></div>
+        <div><label class="field-label">現在價格</label><input class="field-input" id="input-price" type="number" value="${form.currentPrice||''}" oninput="form.currentPrice=this.value" placeholder="e.g. 920"></div>
       </div>
       <div class="strategy-section">
         <div class="strategy-section-title">📋 操作策略設定</div>`;
