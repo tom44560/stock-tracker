@@ -191,29 +191,32 @@ function getRefFields(stock) {
   const seen=new Set();return fields.filter(f=>{if(seen.has(f.k))return false;seen.add(f.k);return true;});
 }
 
-async function fetchStock(symbol) {
-  if(!symbol||symbol.length<4)return;
+async function fetchStock() {
+  const symbol = form.symbol || document.querySelector('input[placeholder="e.g. 2330"]')?.value;
+  if(!symbol||symbol.length<4){alert("請先輸入股票代碼");return;}
+  form.symbol = symbol;
   fetching=true;fetchMsg="查詢中...";render();
   try {
+    console.log("Fetching:", `${API}/stock?symbol=${symbol}`);
     const res=await fetch(`${API}/stock?symbol=${symbol}`);
     const data=await res.json();
+    console.log("Got data:", data);
     if(data.stat==="OK"&&data.data&&data.data.length>0){
       const latest=data.data[data.data.length-1];
-      const closePrice=parseFloat(latest[6].replace(/,/g,""));
+      const closePrice=parseFloat(String(latest[6]).replace(/,/g,""));
       const titleParts=data.title.split(" ").map(s=>s.trim()).filter(Boolean);
       const nameIdx=titleParts.findIndex(p=>p===symbol);
       const stockName=nameIdx>=0&&titleParts[nameIdx+1]?titleParts[nameIdx+1]:symbol;
-      if(!form.name)form.name=stockName;
-      if(!isNaN(closePrice))form.currentPrice=String(closePrice);
+      form.name=stockName;
+      form.currentPrice=String(closePrice);
       fetchMsg="✅ "+stockName+" 收盤價 $"+closePrice;
-      render();
-      const nameInput=document.getElementById('input-name');
-      const priceInput=document.getElementById('input-price');
-      if(nameInput&&!form.name)nameInput.value=stockName;
-      if(priceInput&&!isNaN(closePrice))priceInput.value=closePrice;
-    } else { fetchMsg="⚠️ 查無資料，請手動輸入"; render(); }
-  } catch(e) { fetchMsg="❌ 查詢失敗，請手動輸入"; render(); }
-  fetching=false;render();
+    } else { fetchMsg="⚠️ 查無資料，請手動輸入"; }
+  } catch(e) { 
+    console.error("Fetch error:", e);
+    fetchMsg="❌ 查詢失敗: "+e.message; 
+  }
+  fetching=false;
+  render();
 }
 
 async function autoUpdateFridays(stockId, symbol) {
@@ -408,7 +411,7 @@ function render() {
         <label class="field-label">股票代碼</label>
         <div class="fetch-row">
           <input class="field-input" style="flex:1" value="${form.symbol||''}" oninput="form.symbol=this.value;fetchMsg=''" placeholder="e.g. 2330">
-          <button class="btn-fetch" onclick="fetchStock(form.symbol)" ${fetching?'disabled':''} style="${fetching?'background:#e2e8f0;color:#94a3b8':''}">${fetching?'查詢中...':'🔍 查詢'}</button>
+          <button class="btn-fetch" onclick="fetchStock()" ${fetching?'disabled':''} style="${fetching?'background:#e2e8f0;color:#94a3b8':''}">${fetching?'查詢中...':'🔍 查詢'}</button>
         </div>
         ${fetchMsg?`<div class="fetch-msg" style="color:${fetchMsg.startsWith('✅')?'#059669':fetchMsg.startsWith('⚠️')?'#d97706':'#dc2626'}">${fetchMsg}</div>`:''}
       </div>
